@@ -2,3 +2,5 @@
 *.key
 secrets/
 local-llm-telegram-chatbot/
+__pycache__/
+*.pyc

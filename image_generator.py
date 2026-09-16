@@ -1,32 +1,43 @@
 # image_generator.py
+"""کلاس غیرمسدودکننده و سریع برای تولید تصویر با استفاده از Pollinations.ai"""
 
-import requests
+import random
 import urllib.parse
 from typing import Optional
+import httpx
+
 
 class ImageGenerator:
-    """کلاس تولید عکس با استفاده از Pollinations.ai"""
-    
+    """تولید تصویر آسنکرون با استفاده از هوش مصنوعی Pollinations.ai"""
+
     def __init__(self):
-        # آدرس پایه API
         self.base_url = "https://image.pollinations.ai/prompt/"
-    
-    def generate_image(self, prompt: str) -> Optional[bytes]:
-        """تولید عکس بر اساس پرامپت کاربر"""
+
+    async def generate_image(self, prompt: str, width: int = 1024, height: int = 1024) -> Optional[bytes]:
+        """تولید عکس بر اساس پرامپت کاربر با seed تصادفی و به صورت آسنکرون"""
         try:
-            # پرامپت رو برای URL آماده می‌کنیم
-            encoded_prompt = urllib.parse.quote(prompt)
-            
-            # ساخت URL نهایی (ابعاد ۱۰۲۴ در ۱۰۲۴)
-            url = f"{self.base_url}{encoded_prompt}?width=1024&height=1024&seed=42"
-            
-            # درخواست GET
-            response = requests.get(url, timeout=60)
-            response.raise_for_status()
-            
-            # محتوای عکس رو برمی‌گردونیم
-            return response.content
-            
+            encoded_prompt = urllib.parse.quote(prompt.strip())
+            # ایجاد یک seed کاملاً تصادفی برای تنوع در خروجی
+            random_seed = random.randint(1, 9999999)
+            url = f"{self.base_url}{encoded_prompt}?width={width}&height={height}&seed={random_seed}&nologo=true"
+
+            async with httpx.AsyncClient(timeout=httpx.Timeout(45.0, connect=10.0)) as client:
+                response = await client.get(url)
+                response.raise_for_status()
+
+                # اعتبارسنجی ساده نوع محتوا
+                content_type = response.headers.get("content-type", "")
+                if "image" in content_type or len(response.content) > 1000:
+                    return response.content
+
+                print(f"⚠️ Unexpected content type: {content_type}")
+                return response.content
+
         except Exception as e:
-            print(f"❌ Image generation error: {e}")
+            print(f"❌ Async Image generation error: {e}")
             return None
+
+    def generate_image_sync(self, prompt: str) -> Optional[bytes]:
+        """متد همگام برای سازگاری"""
+        import asyncio
+        return asyncio.run(self.generate_image(prompt))

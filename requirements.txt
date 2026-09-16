@@ -1,0 +1,8 @@
+python-telegram-bot[all]>=20.0
+python-dotenv
+httpx
+requests
+beautifulsoup4
+aiosqlite
+chromadb
+sentence-transformers
