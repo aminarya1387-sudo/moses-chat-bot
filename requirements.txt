@@ -4,5 +4,3 @@ httpx
 requests
 beautifulsoup4
 aiosqlite
-chromadb
-sentence-transformers

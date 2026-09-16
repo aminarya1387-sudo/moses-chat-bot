@@ -467,6 +467,8 @@ assistant:"""
 
 
 def main():
+    keep_alive()
+
     if not TELEGRAM_TOKEN:
         print("❌ TELEGRAM_BOT_TOKEN is not set in .env! Please configure it.")
         return
@@ -476,7 +478,6 @@ def main():
     print(f"👨‍💻 Creator: {BOT_CREATOR}")
     print(f"📰 News Engine: Washington Post & Iran International (Interactive Code & Full Report)")
     print(f"⚡ Concurrency Engine: 100% Async / Non-blocking")
-    keep_alive()
 
     app = Application.builder().token(TELEGRAM_TOKEN).build()
 
